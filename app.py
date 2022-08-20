@@ -44,7 +44,7 @@ def get_feature_dic(feature_name,dic = all_dic):
 
 def main():
     # Face Analysis Application #
-    st.title("Traffic Accident Severity prediction")
+    st.title("Traffic Accident Severity prediction in the UK")
     activities = ["Home", "Predict Traffic Accident Severity", "About"]
     choice = st.sidebar.selectbox("Select Activity", activities)
     st.sidebar.markdown(
@@ -59,7 +59,7 @@ def main():
                                             </br>"""
         st.markdown(html_temp_home1, unsafe_allow_html=True)
         st.write("""
-                 The mian functionality of the application to predict the injury on 3-step scale.
+                 The main functionality of the application to predict the injury on 3-step scale.
                  1. Fatal
                  2. Serious.
                  3. Slight
