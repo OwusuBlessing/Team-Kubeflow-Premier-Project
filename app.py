@@ -6,7 +6,6 @@ Created on Fri Aug 19 21:32:41 2022
 
 """
 import numpy as np
-import pandas as pd
 import streamlit as st
 import pickle
 feature_names = ['Location_Easting_OSGR', 'Location_Northing_OSGR', 'Longitude',
