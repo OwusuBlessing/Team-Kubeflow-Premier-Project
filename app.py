@@ -8,6 +8,7 @@ Created on Fri Aug 19 21:32:41 2022
 import numpy as np
 import streamlit as st
 import pickle
+
 feature_names = ['Location_Easting_OSGR', 'Location_Northing_OSGR', 'Longitude',
        'Latitude', 'Police_Force', 'Number_of_Vehicles',
        'Number_of_Casualties', 'Day_of_Week', 'Local_Authority_(District)',
