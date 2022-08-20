@@ -17,13 +17,13 @@ feature_names = ['Location_Easting_OSGR', 'Location_Northing_OSGR', 'Longitude',
        '2nd_Road_Number', 'Light_Conditions', 'Weather_Conditions',
        'Road_Surface_Conditions', 'Carriageway_Hazards', 'Urban_or_Rural_Area',
        'Did_Police_Officer_Attend_Scene_of_Accident', 'Hour', 'Month']
-with open('C:/Users/ME/Desktop/Blessing_AI/hamoye/Kubeflow/all_encoded_features.json', 'rb') as fp:
+with open("Json_files/all_encoded_features.json", 'rb') as fp:
     all_dic = pickle.load(fp)
     
-with open('C:/Users/ME/Desktop/Blessing_AI/hamoye/Kubeflow/min_max_dic.json', 'rb') as fp:
+with open('Json_files/min_max_dic.json', 'rb') as fp:
     minmax_dic = pickle.load(fp)
     
-path = "C:/Users/ME/Desktop/Blessing_AI/hamoye/Kubeflow/xgb_top_25_features.pkl"
+path = "Model/xgb_top_25_features.pkl"
 def load_model(path):
     with open(path,"rb") as f:
         model = pickle.load(f)
@@ -44,7 +44,7 @@ def get_feature_dic(feature_name,dic = all_dic):
 
 def main():
     # Face Analysis Application #
-    st.title("Real Time Accident Severity prediction")
+    st.title("Traffic Accident Severity prediction")
     activities = ["Home", "Predict Traffic Accident Severity", "About"]
     choice = st.sidebar.selectbox("Select Activity", activities)
     st.sidebar.markdown(
@@ -75,28 +75,28 @@ def main():
             log_value_2 = np.log(Location_Northing_OSGR)
             north_scaled = scale_value("Location_Easting_OSGR",log_value_2)
             
-            Longitude = st.number_input("Enter the longitude of the accident location")
+            Longitude = st.number_input("Enter the longitude(GWS84 format) of the accident location")
             long_scaled = scale_value("Location_Easting_OSGR",Longitude)
             
-            Latitude= st.number_input("Enter the latitude of accident location")
+            Latitude= st.number_input("Enter the latitude(GWS84 format)  of accident location")
             log_value_3 = np.log(Latitude)
             lat_scaled = scale_value("Location_Easting_OSGR",log_value_3)
             
-            police_force = st.radio("whihc Police is assigned or responsible in area of accident",tuple(get_feature_dic("Police_Force").keys()))
+            police_force = st.selectbox("which Police is assigned or responsible in area of accident",tuple(get_feature_dic("Police_Force").keys()))
             police_force_code = get_value("Police_Force",police_force)
             pf_scld = scale_value("Police_Force",police_force_code )
             
-            number_of_vehicle = st.number_input("Enter number of vehicles involved")
+            number_of_vehicle = st.number_input("Enter number of vehicles involved",min_value=1,max_value=100,step=1)
             nfv_scld = scale_value("Number_of_Vehicles",number_of_vehicle)
             
-            Number_of_Casualties= st.number_input("How many Casualities are involved")
+            Number_of_Casualties= st.number_input("How many Casualities are involved",min_value=1,max_value=100,step=1)
             ncs_scld = scale_value("Number_of_Casualties", Number_of_Casualties)
             
             Day_of_week = st.radio("Select the day of the incidence",tuple(get_feature_dic("Day_of_week").keys()))
             day_code = get_value("Day_of_week",Day_of_week)
             df_week_scld = scale_value("Day_of_Week",day_code)
             
-            Local_Authority_District = st.radio("Select the local authority district",tuple(get_feature_dic("Local_Authority_District").keys()))
+            Local_Authority_District = st.selectbox("Select the local authority district",tuple(get_feature_dic("Local_Authority_District").keys()))
             lc_code = get_value("Local_Authority_District",Local_Authority_District)
             lc_scld = scale_value("Local_Authority_(District)",lc_code)
             
@@ -104,7 +104,7 @@ def main():
             road_code = get_value("first_road_class",First_Road_Class)
             rc_scld = scale_value("1st_Road_Class",road_code)
             
-            first_road_number = st.number_input("What is the number of the road selected above?")
+            first_road_number = st.number_input("What is the number of the road selected above?",min_value=1,max_value=500,step=1)
             frn_scld = scale_value("1st_Road_Number",first_road_number)
             
             Road_Type = st.radio("What type of road did the accident occur",tuple(get_feature_dic("Road_type").keys()))
@@ -127,7 +127,7 @@ def main():
             src_code = get_value("second_road_class",second_road_class)
             sr_scaled = scale_value("2nd_Road_Class",src_code)
             
-            road_num = st.number_input("What is the number of road selected in the previous question")
+            road_num = st.number_input("What is the number of road selected in the previous question",min_value=1,max_value=500,step=1)
             scd_number_scld = scale_value("2nd_Road_Number",road_num)
             
             Light_Conditions = st.radio("What type of lighting conditions was available at the site of accident",tuple(get_feature_dic("Light_Conditions").keys()))
@@ -154,11 +154,11 @@ def main():
             plc_code = get_value("Did_Police_Officer_Attend_Scene_of_Accident",plc_attend)
             plc_scld = scale_value("Did_Police_Officer_Attend_Scene_of_Accident",plc_code)
             
-            hr = st.radio("What hour of the day did the accident occur?",tuple(get_feature_dic("Hour_of_accident").keys()))
+            hr = st.selectbox("What hour of the day did the accident occur?",tuple(get_feature_dic("Hour_of_accident").keys()))
             hr_code = get_value("Hour_of_accident",hr)
             hr_scld = scale_value("Hour",hr_code)
             
-            month = st.radio("Select the month the accident occured",tuple(get_feature_dic("Month_of_occurence").keys()))
+            month = st.selectbox("Select the month the accident occured",tuple(get_feature_dic("Month_of_occurence").keys()))
             month_code = get_value("Month_of_occurence",month)
             month_scld = scale_value("Month",month_code)
             
@@ -179,13 +179,13 @@ def main():
                 preds = load_model(path).predict(single_sample)
               
                 if preds == 0:
-                      st.write("This is likely to be a fatal accident")
+                      st.write("Fatal")
                       
                 elif preds == 1:
-                      st.write("This is likely to be serious accidents")
+                      st.write("Serious")
                     
                 else:
-                      st.write("This looks like a slight accidente but more findings should be done")
+                      st.write("Slight")
                     
                              
                       
@@ -212,7 +212,7 @@ def main():
 
         html_temp4 = """
                                      <div style="background-color:#98AFC7;padding:10px">
-                                     <h4 style="color:white;text-align:center;">This Application is developed by Mohammad Juned Khan using Streamlit Framework, Opencv, Tensorflow and Keras library for demonstration purpose. If you're on LinkedIn and want to connect, just click on the link in sidebar and shoot me a request. If you have any suggestion or wnat to comment just write a mail at Mohammad.juned.z.khan@gmail.com. </h4>
+                                     <h4 style="color:white;text-align:center;">This Application is developed by Team Kubeflow of hamoye summer internshop 2022 using Streamlit Framework for the purpose of desmontrating traffic accident severity prediction to estimate accidents's injury degree</h4>
                                      <h4 style="color:white;text-align:center;">Thanks for Visiting</h4>
                                      </div>
                                      <br></br>
